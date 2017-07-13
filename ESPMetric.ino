@@ -24,11 +24,11 @@ WundergroundClient wunderground(IS_METRIC);
 #include <ArduinoJson.h>
 #include "FS.h"
 
-#define PINMATRIX 14
+#define PINMATRIX D2
 
-#define PINBTLEFT 5
-#define PINBTCENTER 4
-#define PINBTRIGHT 15
+#define PINBTLEFT D5
+#define PINBTCENTER D4
+#define PINBTRIGHT D3
 
 #define DEBUG  1
 
@@ -125,6 +125,7 @@ static unsigned char twitter[]={0x04,0x8f,0x6e,0x7e,0x7e,0x3c,0x38,0x30};
 static unsigned char sun[]={0x24,0x00,0xbd,0x7e,0x7e,0x7e,0x00,0x00};
 static unsigned char mask[]={0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff};
 static unsigned char cloud[]={0x00,0x00,0x00,0x06,0x6f,0xef,0xff,0x7e};
+static unsigned char snow[]={0x00,0x00,0x54,0x38,0x6c,0x38,0x54,0x00};
 
 int countRss=0;
 String tabRss[2];
@@ -633,6 +634,7 @@ int defilement=0;
 int meteoCount=0;
 void meteo()
 {
+	String icon = "";
   
   matrix.setTextColor(colors[6]);
   matrix.setCursor(tmpX, positionReel);
@@ -666,20 +668,20 @@ void meteo()
     
   }
    //GESTION DES ICONES
-
-  if ((wunderground.getMeteoconIcon(wunderground.getTodayIconText())=="H")|| (wunderground.getMeteoconIcon(wunderground.getTodayIconText())=="J"))
+	icon = wunderground.getMeteoconIcon(wunderground.getTodayIconText());
+  if (icon =="H"|| icon =="J")
   {
-    matrix.drawBitmap(0, positionReel,  mask, 8,8,colors[8]);
+     matrix.drawBitmap(0, positionReel,  cloud, 8,8,colors[6]);
+  }else if (icon =="B")
+  {
     matrix.drawBitmap(0, positionReel,  sun, 8,8,colors[2]);
-    matrix.drawBitmap(0, positionReel,  cloud, 8,8,colors[6]);
-  }else if (wunderground.getMeteoconIcon(wunderground.getTodayIconText())=="B")
+  }else if (icon=="Y" || icon =="M")
   {
-    matrix.drawBitmap(0, positionReel,  mask, 8,8,colors[8]);
-    matrix.drawBitmap(0, positionReel,  sun, 8,8,colors[2]);
-  }else if ((wunderground.getMeteoconIcon(wunderground.getTodayIconText())=="Y") || (wunderground.getMeteoconIcon(wunderground.getTodayIconText())=="M"))
+    matrix.drawBitmap(0, positionReel,  mask, 8,8,colors[6]);
+  }
+  else
   {
-    matrix.drawBitmap(0, positionReel,  mask, 8,8,colors[8]);
-    matrix.drawBitmap(0, positionReel,  cloud, 8,8,colors[6]);
+	  matrix.drawBitmap(0, positionReel,  snow, 8,8,colors[2]);
   }
   defilement++;
   delay(20);
